@@ -54,24 +54,35 @@ class Line:
             self.point1.x, self.point1.y, self.point2.x, self.point2.y, fill=fill_color, width=2
         )
 
+class Cell:
+    def __init__(self, x1, y1, x2, y2, win):
+        self._x1 = x1
+        self._y1 = y1
+        self._x2 = x2 
+        self._y2 = y2 
+        self._win = win
+        self.has_left_wall = True
+        self.has_right_wall = True
+        self.has_top_wall = True
+        self.has_bottom_wall = True
+
+    def draw(self):
+        if self.has_left_wall:
+            self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), "black")
+        if self.has_top_wall:
+            self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), "black")
+        if self.has_right_wall:
+            self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), "black")
+        if self.has_bottom_wall:
+            self._win.draw_line(Line(Point(self._x2, self._y2), Point(self._x1, self._y2)), "black")
+        
+
 def main():
     win = Window(800, 600)
-    p1 = Point(100, 100)
-    p2 = Point(300, 100)
-    p3 = Point(300, 300)
-    p4 = Point(100, 300)
 
-    # Create lines using the points
-    line1 = Line(p1, p2)
-    line2 = Line(p2, p3)
-    line3 = Line(p3, p4)
-    line4 = Line(p4, p1)
+    cell = Cell(100, 100, 150, 150, win)
+    cell.draw()
 
-    # Draw lines on the window
-    win.draw_line(line1, "red")
-    win.draw_line(line2, "blue")
-    win.draw_line(line3, "green")
-    win.draw_line(line4, "purple")
     win.wait_for_close()
 
 if __name__ == "__main__":
