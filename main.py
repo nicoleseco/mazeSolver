@@ -1,4 +1,5 @@
 from tkinter import *
+import time 
 
 class Window:
     def __init__(self, width, height):
@@ -67,15 +68,89 @@ class Cell:
         self.has_bottom_wall = True
 
     def draw(self):
+        background_color = "#d9d9d9"
         if self.has_left_wall:
             self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), "black")
+        else:
+            self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x1, self._y2)), background_color)
         if self.has_top_wall:
             self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), "black")
+        else:
+            self._win.draw_line(Line(Point(self._x1, self._y1), Point(self._x2, self._y1)), background_color)
         if self.has_right_wall:
             self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), "black")
+        else:
+            self._win.draw_line(Line(Point(self._x2, self._y1), Point(self._x2, self._y2)), background_color)
         if self.has_bottom_wall:
             self._win.draw_line(Line(Point(self._x2, self._y2), Point(self._x1, self._y2)), "black")
+        else:
+            self._win.draw_line(Line(Point(self._x2, self._y2), Point(self._x1, self._y2)), background_color)
         
+
+    def draw_move(self, to_cell, undo=False):
+        color = "gray" if undo else "red"
+
+    # Start point: center of current cell
+        x1 = (self._x1 + self._x2) // 2
+        y1 = (self._y1 + self._y2) // 2
+
+    # End point: center of to_cell
+        x2 = (to_cell._x1 + to_cell._x2) // 2
+        y2 = (to_cell._y1 + to_cell._y2) // 2
+
+        self._win.draw_line(Line(Point(x1, y1), Point(x2, y2)), color)
+
+
+class Maze:
+    def __init__(self, x1, y1, num_rows, num_cols, cell_size_x, cell_size_y, win):
+        self._x1 = x1
+        self._y1 = y1
+        self._num_rows = num_rows
+        self._num_cols = num_cols
+        self._cell_size_x = cell_size_x
+        self._cell_size_y = cell_size_y
+        self._win = win
+        self._cells = []
+
+        self._create_cells()
+        self._break_entrance_and_exit()
+
+
+    def _create_cells(self): 
+        for col in range(self._num_cols):
+            column = []
+            for row in range(self._num_rows):
+                x1 = self._x1 + col * self._cell_size_x
+                y1 = self._y1 + col * self._cell_size_y
+                x2 = x1 + self._cell_size_x
+                y2 = y1 + self._cell_size_y
+
+                cell=Cell(s1, y1, x2, y2, self._win)
+                column.append(cell)
+            self._cells.append(column)
+
+        for col in range(self._num_cols):
+            for row in range(self._num_rows):
+                self._draw_cell(col, row)
+    
+    def _draw_cell(self, i, j):
+        cell = self._cells[i][j]
+        cell.draw()
+        self._animate()
+
+    def _animate(self):
+        self._win.redraw()
+        time.sleep(0.05)
+    
+    def _break_entrance_and_exit(self):
+        entrance_cell = self._cells[0][0]
+        entrance_cell.has_top_wall = False
+        self._draw_cell(0,0)
+
+        exit_cell = self._cells[self._num_cols - 1][self._num_rows-1]
+        exit_cell.has_bottom_wall = False
+        self._draw_cell(self._num_cols -1, self._num_rows -1)
+
 
 def main():
     win = Window(800, 600)
